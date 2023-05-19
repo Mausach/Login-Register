@@ -11,9 +11,11 @@ export const RegisterPage = () => {
     contraseña:"",
     confirmarContraseña:"",
   })
+  const [error,setError]=useState(false);
 
   const onInputChange=(e)=>{
     setUser({
+      //con estas 2 lineas de codigo leemos los datos ingresados
       ...user,
       [e.target.name]:e.target.value,
     });
@@ -22,6 +24,17 @@ export const RegisterPage = () => {
 
   const onSubmit=(e)=>{
   e.preventDefault();
+  if(user.nombre.trim()==="" || 
+  user.email.trim()==="" || 
+  user.edad < 18 || 
+  user.contraseña.trim()==="" || 
+  user.confirmarContraseña.trim()=== ""){
+    console.log("todos los campos son obligatorios");
+    return setError(true);
+  }else if(user.contraseña != user.confirmarContraseña){
+    return console.log("las contraseñas deben ser iguales");
+  }
+    setError(false);
     console.log(user);
   }
   
@@ -32,6 +45,7 @@ export const RegisterPage = () => {
         <h1>pagina de Registro</h1>
 
 <Form className='p-3' onSubmit={onSubmit}>
+  {error ? <p className='bg-danger w-100 text-center p-4 text-white fs-5'>Fallo en la validacion</p>:''}
       <Form.Group className="mb-3" controlId="formBasicEmail">
         <Form.Label>Nombre Completo</Form.Label>
         <Form.Control type="text" name='nombre' placeholder="" value={user.nombre} onChange={onInputChange} />
