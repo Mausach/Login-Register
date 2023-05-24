@@ -1,14 +1,15 @@
 import React, { useState } from 'react'
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
+import { authApi } from '../../APIS/authApi';
 
 export const RegisterPage = () => {
   
   const [user,setUser]=useState({
-    nombre:"",
+    name:"",
     email: "",
     edad: 0,
-    contraseña:"",
+    password:"",
     confirmarContraseña:"",
   })
   const [error,setError]=useState(false);
@@ -24,19 +25,43 @@ export const RegisterPage = () => {
   }
 
   const onSubmit=(e)=>{
+
   e.preventDefault();
-  if(user.nombre.trim()==="" || 
+
+  if(user.name.trim()==="" || 
   user.email.trim()==="" || 
   user.edad < 18 || 
-  user.contraseña.trim()==="" || 
+  user.password.trim()==="" || 
   user.confirmarContraseña.trim()=== ""){
+    setError(true);
     return setErrorMsg("todos los campos son obligatorios");
-    return setError(true);
-  }else if(user.contraseña != user.confirmarContraseña){
+    
+  }else if(user.password != user.confirmarContraseña){
+    setError(true);
     return setErrorMsg("las contraseñas deben ser iguales");
   }
     setError(false);
     console.log(user);
+    starRegister(user.name,user.email,user.edad,user.password);
+  }
+
+  //funcion que va a ir al back y que guarda el usuario creado
+  const starRegister=async (name,email,edad,password)=>{
+    try {
+      const resp=await authApi.post('/auth',{
+        name,
+        email,
+        edad,
+        password,
+      });
+      console.log(resp);
+      
+    } catch (error) {
+      console.log(error.response.data.msg);
+      setError(true);
+      setErrorMsg(error.response.data.msg);
+    }
+
   }
   
   
@@ -49,7 +74,7 @@ export const RegisterPage = () => {
   {error ? <p className='bg-danger w-100 text-center p-4 text-white fs-5'>{errorMsg}</p>:''}
       <Form.Group className="mb-3" controlId="formBasicEmail">
         <Form.Label>Nombre Completo</Form.Label>
-        <Form.Control type="text" name='nombre' placeholder="" value={user.nombre} onChange={onInputChange} />
+        <Form.Control type="text" name='name' placeholder="" value={user.nombre} onChange={onInputChange} />
         
       </Form.Group>
 
@@ -67,7 +92,7 @@ export const RegisterPage = () => {
 
       <Form.Group className="mb-3" controlId="formBasicPassword">
         <Form.Label>Contraseña</Form.Label>
-        <Form.Control type="password" name='contraseña' placeholder="Password" value={user.contraseña} onChange={onInputChange}/>
+        <Form.Control type="password" name='password' placeholder="Password" value={user.password} onChange={onInputChange}/>
       </Form.Group>
 
       <Form.Group className="mb-3" controlId="formBasicPassword">
